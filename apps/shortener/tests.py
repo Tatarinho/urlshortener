@@ -53,7 +53,7 @@ class TestShortURLModel:
 
         response = client.post(reverse('encode'), {'url': url})
         assert response.status_code == 201
-        short_code = response.json()['url'].split('/')[-1]  # Pobierz short_code z pełnego URL-a
+        short_code = response.json()['url'].split('/')[-1]
 
         decode_response = client.get(reverse('decode', args=[short_code]))
         assert decode_response.status_code == 200

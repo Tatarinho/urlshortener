@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <style>
+        body {
+            background-color: #f7fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            margin-top: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        button {
+            background-color: #3b82f6;
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 16px;
+            display: block;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #2563eb;
+        }
+        .output {
+            margin-top: 16px;
+        }
+        .output a {
+            color: #3b82f6;
+            text-decoration: underline;
+        }
+        .output .error {
+            color: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>URL Shortener</h1>
+        <div id="result">
+            <input type="text" id="url-input" name="url" placeholder="Enter URL or Short URL" required>
+            <button onclick="processUrl()">Convert</button>
+        </div>
+        <div id="output" class="output"></div>
+    </div>
+
+    <script>
+        function processUrl() {
+            var urlInput = document.getElementById('url-input').value;
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/process/?url=' + encodeURIComponent(urlInput), true);
+            xhr.onload = function() {
+                var outputDiv = document.getElementById('output');
+                if (xhr.status >= 200 && xhr.status < 400) {
+                    try {
+                        var data = JSON.parse(xhr.responseText);
+                        if (data.url) {
+                            outputDiv.innerHTML = `<a href="${data.url}" target="_blank">${data.url}</a>`;
+                        } else if (data.error) {
+                            outputDiv.innerHTML = `<span class="error">${data.error}</span>`;
+                        }
+                    } catch (e) {
+                        console.error("JSON parsing error: ", e);
+                    }
+                } else {
+                    outputDiv.innerHTML = '<span class="error">Invalid url</span>';
+                }
+            };
+            xhr.onerror = function() {
+                document.getElementById('output').innerHTML = '<span class="error">Request failed.</span>';
+            };
+            xhr.send();
+        }
+    </script>
+</body>
+</html>
