@@ -8,7 +8,6 @@ class ShortURLAdmin(admin.ModelAdmin):
     search_fields = ('url', 'short_code')
     readonly_fields = ('created_at',)
 
-    # Optional: To make short_code read-only after creation
     def get_readonly_fields(self, request, obj=None):
         if obj:
             return self.readonly_fields + ('short_code',)

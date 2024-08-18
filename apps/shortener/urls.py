@@ -1,5 +1,5 @@
-from django.urls import path
 from apps.shortener.views import EncodeURLView, DecodeURLView, RedirectView, IndexView, ProcessURLView
+from django.urls import path
 
 urlpatterns = [
     path('', IndexView.as_view(), name='index'),

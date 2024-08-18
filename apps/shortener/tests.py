@@ -60,3 +60,15 @@ class TestShortURLModel:
         data = decode_response.json()
         assert 'url' in data
         assert data['url'] == url
+
+    def test_invalid_url_input(self, client):
+        """Test that an invalid URL input is handled properly."""
+        response = client.post(reverse('encode'), {'url': 'invalid-url'})
+        assert response.status_code == 400
+        assert 'error' in response.json()
+
+    def test_short_code_conflict(self):
+        """Test that manually setting a short code that already exists raises an error."""
+        ShortURL.objects.create(url="https://www.example1.com", short_code="12345678")
+        with pytest.raises(Exception):
+            ShortURL.objects.create(url="https://www.example2.com", short_code="12345678")

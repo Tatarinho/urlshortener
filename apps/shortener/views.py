@@ -1,3 +1,6 @@
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
+from django.http import HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,7 +11,7 @@ from .utils import encode_url, decode_url, build_full_url, is_internal_link
 
 
 class URLMixin:
-    def encode_and_build_url(self, request, url):
+    def encode_and_build_url(self, request: HttpRequest, url: str):
         short_url, created = encode_url(url)
         full_url = build_full_url(request, short_url.short_code)
         return full_url, created
@@ -19,6 +22,12 @@ class EncodeURLView(APIView, URLMixin):
         url = request.data.get('url', '')
         if not url:
             return Response({'error': 'URL is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        validator = URLValidator()
+        try:
+            validator(url)
+        except ValidationError:
+            return Response({'error': 'Invalid URL'}, status=status.HTTP_400_BAD_REQUEST)
 
         full_url, created = self.encode_and_build_url(request, url)
         return Response({'url': full_url}, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
